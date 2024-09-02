@@ -1,0 +1,32 @@
+package com.unciacibildpd.model
+import com.unciacibildpd.model.Cibil;
+import com.unciacibildpd.model.DPD
+
+import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+
+dialect "mvel"
+
+
+rule "Testing date"
+	salience 7
+	when
+	then 
+		insert(Date.from(LocalDate.now().minusDays(180).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+end
+
+rule "Civil DPD"
+salience 6
+	when
+		_180daysAgo : Date()
+    	Cibil($dpds : listOfDPD )
+		$dpd: DPD(defaultDays > 90, reportingDate >  _180daysAgo) from $dpds
+
+    then
+    $dpd.setRuleValidation(true);
+  System.out.println("_180daysAgo "+$dpd.getDefaultDays());
+  
+end
+
